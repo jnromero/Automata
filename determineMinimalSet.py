@@ -1,5 +1,5 @@
-# from Automaton import Automaton
-import random
+from __future__ import print_function,division,absolute_import   
+from Automaton import Automaton
 import bitarray
 import pickle
 import itertools
@@ -200,15 +200,6 @@ def generateRandomAutomaton(numberStates,actions):
   return thisA
 
 
-def numberToAction(number):
-  if number==0:
-    out="C"
-  elif number==1:
-    out="D"
-  elif number==2:
-    out="E"
-  return number
-
 def getBin(number):
   if number==0:
     out='00'
@@ -285,7 +276,7 @@ def getMinimal(numberActions,numberStates):
         if thisBit not in allAutomata[thisString]:
           allAutomata[thisString].append(thisBit)
           count+=1
-          print count,k
+          print(count,k)
 
 
   data=[]
@@ -295,4 +286,19 @@ def getMinimal(numberActions,numberStates):
   pickle.dump(data,file)
   file.close() 
 
+
+
+def timeTest():
+  #for testing
+  import time
+  start=time.time()
+  for k in range(100000):
+    generateRandomAutomaton(8,['C',"D"])
+  print(time.time()-start)
+
+timeTest()
+
+import time
+start=time.time()
 getMinimal(3,3)
+print(time.time()-start)

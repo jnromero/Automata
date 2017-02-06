@@ -2,6 +2,7 @@ import random
 import math
 import time
 
+
 class Automaton(object):
   __slots__ = ('currentState','states','actions','start','string')
   def __init__(self,start,states,actions):
@@ -10,18 +11,20 @@ class Automaton(object):
     self.states=states
     self.actions=actions
     self.string="-1"
+
   def makeChoice(self):
+    #these are relatively slow
     return self.states[self.currentState]['action']
-  def transition(self,input):
-    if len(input)==1:
-      this=input[0]
-    self.currentState=self.states[self.currentState][this]
+
+  def transition(self,otherAction):
+    #these are relatively slow
+    self.currentState=self.states[self.currentState][otherAction]
 
   def clean(self):
     self.eliminateNonVisited()
     self.minimizeAutomaton()
-    #self.renameAndReorderStates()
-    #self.getString()
+    self.renameAndReorderStates()
+    self.getString()
 
   def eliminateNonVisited(self):
     #find states that are visited
@@ -153,6 +156,7 @@ class Automaton(object):
       self.currentState=self.start
 
   def renameAndReorderStates(self):
+    #reorders to unique automaton
     toCheck=[self.start]
     order=[]
     while len(toCheck)>0:
@@ -181,31 +185,99 @@ class Automaton(object):
   def getString(self):
     self.string="%s"%(self.start)
     for k in self.states:
-      self.string=self.string+"%s"%(self.states[k]['action'])
+      self.string+="%s"%(self.states[k]['action'])
       for action in self.actions:
-        self.string=self.string+"%s"%(self.states[k][action])
+        self.string+="%s"%(self.states[k][action])
     
-
 
 
 def generateRandomAutomaton(numberStates,actions):
   start=random.choice(range(numberStates))
   states={}
   for k in range(numberStates):
-    this={}
-    this['action']=random.choice(actions)
+    states[k]={}
+    states[k]['action']=random.choice(actions)
     for a in actions:
-      this[a]=random.choice(range(numberStates))
-    states[k]=this
+      states[k][a]=random.choice(range(numberStates))
   thisA=Automaton(start,states,actions)
   thisA.clean()
   return thisA
 
 
+def getHistory(A1,A2,periods):
+  history=[]
+  for p in xrange(periods):
+    action1=A1.states[A1.currentState]['action']
+    action2=A2.states[A2.currentState]['action']
+    #tuple is faster
+    history.append((action1,action2))
 
-#for testing
-import time
-start=time.time()
-for k in range(100000):
-  generateRandomAutomaton(8,['C',"D"])
-print time.time()-start
+    A1.currentState=A1.states[A1.currentState][action2]
+    A2.currentState=A2.states[A2.currentState][action1]
+
+  return history
+
+
+def getPayoffs(A1,A2,periods,payoffs):
+  totalPay1=0
+  totalPay2=0
+  for p in xrange(periods):
+    #manual choices are faster
+    action1=A1.states[A1.currentState]['action']
+    action2=A2.states[A2.currentState]['action']
+
+    totalPay1+=payoffs[action1][action2][0]
+    totalPay2+=payoffs[action1][action2][1]
+
+    #manual transitions are faster
+    A1.currentState=A1.states[A1.currentState][action2]
+    A2.currentState=A2.states[A2.currentState][action1]
+
+  return (float(totalPay1)/periods,float(totalPay2)/periods)
+
+
+def getPayoffHistory(A1,A2,periods,payoffs):
+  payoffHistory=[]
+  for p in xrange(periods):
+
+    #manual choices are faster
+    action1=A1.states[A1.currentState]['action']
+    action2=A2.states[A2.currentState]['action']
+
+    payoffHistory.append(payoffs[action1][action2])
+
+    #manual transitions are faster
+    A1.currentState=A1.states[A1.currentState][action2]
+    A2.currentState=A2.states[A2.currentState][action1]
+
+  return payoffHistory
+
+def testFunctions():
+  t=time.time()
+  for k in range(100000):
+    # getHistory(A1,A2,10)
+    getPayoffs(A1,A2,10,pays)
+    #generateRandomAutomaton(8,['C',"D"])
+  print time.time()-t
+
+
+
+
+#WSLS
+start=0
+states={0: {'action': 'C', 'C': 0, 'D': 1},
+1: {'action': 'D', 'C': 1, 'D': 0}}
+actions=["C","D"]
+A1=Automaton(start,states,actions)
+
+#ALLD
+start=0
+states={0: {'action': 'D', 'C': 0, 'D': 0}}
+actions=["C","D"]
+A2=Automaton(start,states,actions)
+
+#payoffs
+#{"player1Action1":{"player2Action1":[pay1_11,pay2_11],"player2Action2":[pay1_12,pay2_12]}....}
+pays={"C":{"C":[3,3],"D":[1,4]},"D":{"C":[4,1],"D":[2,2]}}
+
+testFunctions()
