@@ -205,6 +205,8 @@ def generateRandomAutomaton(numberStates,actions):
 
 
 def getHistory(A1,A2,periods):
+  A1.currentState=A1.start
+  A2.currentState=A2.start
   history=[]
   for p in xrange(periods):
     action1=A1.states[A1.currentState]['action']
@@ -219,6 +221,8 @@ def getHistory(A1,A2,periods):
 
 
 def getPayoffs(A1,A2,periods,payoffs):
+  A1.currentState=A1.start
+  A2.currentState=A2.start
   totalPay1=0
   totalPay2=0
   for p in xrange(periods):
@@ -237,6 +241,8 @@ def getPayoffs(A1,A2,periods,payoffs):
 
 
 def getPayoffHistory(A1,A2,periods,payoffs):
+  A1.currentState=A1.start
+  A2.currentState=A2.start
   payoffHistory=[]
   for p in xrange(periods):
 
@@ -260,24 +266,3 @@ def testFunctions():
     #generateRandomAutomaton(8,['C',"D"])
   print time.time()-t
 
-
-
-
-#WSLS
-start=0
-states={0: {'action': 'C', 'C': 0, 'D': 1},
-1: {'action': 'D', 'C': 1, 'D': 0}}
-actions=["C","D"]
-A1=Automaton(start,states,actions)
-
-#ALLD
-start=0
-states={0: {'action': 'D', 'C': 0, 'D': 0}}
-actions=["C","D"]
-A2=Automaton(start,states,actions)
-
-#payoffs
-#{"player1Action1":{"player2Action1":[pay1_11,pay2_11],"player2Action2":[pay1_12,pay2_12]}....}
-pays={"C":{"C":[3,3],"D":[1,4]},"D":{"C":[4,1],"D":[2,2]}}
-
-testFunctions()
