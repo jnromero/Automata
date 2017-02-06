@@ -1,17 +1,15 @@
 import Automaton
 
+actions=["C","D"]
+
 #TFT
 start=0
-states={0: {'action': 'C', 'C': 0, 'D': 1},
-1: {'action': 'D', 'C': 0, 'D': 1}}
-actions=["C","D"]
+states={0: {'action':'C','C':0,'D': 1},1:{'action':'D','C': 0,'D':1}}
 A1=Automaton.Automaton(start,states,actions)
 
 #Alternator
 start=0
-states={0: {'action': 'C', 'C': 1, 'D': 1},
-1: {'action': 'D', 'C': 0, 'D': 0}}
-actions=["C","D"]
+states={0:{'action':'C','C':1,'D':1},1:{'action':'D','C':0,'D':0}}
 A2=Automaton.Automaton(start,states,actions)
 
 #payoffs
